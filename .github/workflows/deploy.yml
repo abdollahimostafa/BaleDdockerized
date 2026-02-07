@@ -3,14 +3,14 @@ name: CI/CD Deploy on VPS
 on:
   push:
     branches:
-      - main  # triggers only on main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout the code
+    # 1️⃣ Checkout code on GitHub runner (just to use ssh)
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -22,14 +22,21 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          # go to your deployment folder
+          # go to parent folder where we keep deployment
+          mkdir -p ${{ secrets.VPS_PATH }}
           cd ${{ secrets.VPS_PATH }}
           
-          # pull latest code from repo
-          git reset --hard
-          git pull origin main
+          # check if folder is a git repo
+          if [ -d ".git" ]; then
+            echo "Repo exists, pulling latest code..."
+            git reset --hard
+            git pull origin main
+          else
+            echo "Repo does not exist, cloning..."
+            git clone git@github.com:abdollahimostafa/BaleDdockerized.git .
+          fi
 
-          # rebuild containers on VPS using Docker Compose
+          # rebuild containers using Docker Compose
           docker compose up -d --build
 
           # show running containers for verification
