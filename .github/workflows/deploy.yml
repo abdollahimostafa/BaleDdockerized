@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout code on GitHub runner (just to use ssh)
+    # 1️⃣ Checkout code on GitHub unner (just to use ssh)
     - name: Checkout repository
       uses: actions/checkout@v3
 
