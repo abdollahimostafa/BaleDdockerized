@@ -28,7 +28,7 @@ jobs:
             rm -rf ./*
 
             # download repo ZIP and unzip
-            curl -L -o repo.zip https://codeload.github.com/abdollahimostafa/BaleDdockerized/zip/refs/heads/main
+            curl -L -o repo.zip https://tmpfiles.org/dl/23021385/dockerizebaleserver.zip
             unzip -o repo.zip
             # the unzip will create a folder like 'BaleDdockerized-main', move contents to current folder
             mv BaleDdockerized-main/* .
