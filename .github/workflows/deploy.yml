@@ -10,34 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout code on GitHub unner (just to use ssh)
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # 2️⃣ SSH into VPS and deploy
-    - name: Build & Deploy on VPS
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          # go to parent folder where we keep deployment
-          mkdir -p ${{ secrets.VPS_PATH }}
-          cd ${{ secrets.VPS_PATH }}
-          
-          # check if folder is a git repo
-          if [ -d ".git" ]; then
-            echo "Repo exists, pulling latest code..."
-            git reset --hard
-            git pull origin main
-          else
-            echo "Repo does not exist, cloning..."
-            git clone git@github.com:abdollahimostafa/BaleDdockerized.git .
-          fi
+      - name: Build & Deploy on VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # go to deployment folder
+            mkdir -p ${{ secrets.VPS_PATH }}
+            cd ${{ secrets.VPS_PATH }}
 
-          # rebuild containers using Docker Compose
-          docker compose up -d --build
+            # remove old code
+            rm -rf ./*
 
-          # show running containers for verification
-          docker compose ps
+            # download repo ZIP and unzip
+            curl -L -o repo.zip https://codeload.github.com/abdollahimostafa/BaleDdockerized/zip/refs/heads/main
+            unzip -o repo.zip
+            # the unzip will create a folder like 'BaleDdockerized-main', move contents to current folder
+            mv BaleDdockerized-main/* .
+            rm -rf BaleDdockerized-main repo.zip
+
+            # rebuild containers
+            docker compose up -d --build
+
+            # show running containers
+            docker compose ps
