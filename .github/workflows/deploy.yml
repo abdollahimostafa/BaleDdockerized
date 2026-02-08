@@ -3,39 +3,34 @@ name: CI/CD Deploy on VPS
 on:
   push:
     branches:
-      - main
+      - main  # triggers only on main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    # 1️⃣ Checkout the code
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Build & Deploy on VPS
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # go to deployment folder
-            mkdir -p ${{ secrets.VPS_PATH }}
-            cd ${{ secrets.VPS_PATH }}
+    # 2️⃣ SSH into VPS and deploy
+    - name: Build & Deploy on VPS
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # go to your deployment folder
+          cd ${{ secrets.VPS_PATH }}
+          
+          # pull latest code from repo
+          git reset --hard
+          git pull origin main
 
-            # remove old code
-            rm -rf ./*
+          # rebuild containers on VPS using Docker Compose
+          docker compose up -d --build
 
-            # download repo ZIP and unzip
-            curl -L -o repo.zip https://tmpfiles.org/dl/23021385/dockerizebaleserver.zip
-            unzip -o repo.zip
-            # the unzip will create a folder like 'BaleDdockerized-main', move contents to current folder
-            mv BaleDdockerized-main/* .
-            rm -rf BaleDdockerized-main repo.zip
-
-            # rebuild containers
-            docker compose up -d --build
-
-            # show running containers
-            docker compose ps
+          # show running containers for verification
+          docker compose ps
