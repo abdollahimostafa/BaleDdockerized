@@ -13,7 +13,6 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Clock, Calendar, User, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -42,6 +41,20 @@ interface ApiResponse {
     };
     medics: Medic[];
   };
+}
+function Avatar({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      width={80}
+      height={80}
+      className="object-cover w-full h-full"
+      onError={() => setImgSrc("/default-avatar.png")}
+    />
+  );
 }
 
 export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
@@ -116,9 +129,6 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
 
       const result = await response.json(); // Assuming JSON response
       console.log(result)
-      // Adjust the following line based on the actual response structure.
-      // For example, if the payment link is in result.data.payment_link, use that.
-      // Here, I'm assuming result.data.payment_link for demonstration.
       setPaymentUrl(result.data.payment_url); // Replace with actual path, e.g., result.payment_url
 
       setReservationSuccess(true);
@@ -175,22 +185,16 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
                     <div className="flex items-start gap-5">
                       {/* Doctor Avatar */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-blue-100">
-                          <Image
-                            src={
-                              doc.profile_image.startsWith("http")
-                                ? doc.profile_image
-                                : `https://www.medimedia.ir${doc.profile_image}`
-                            }
-                            alt={doc.full_name}
-                            width={80}
-                            height={80}
-                            className="object-cover w-full h-full"
-                            onError={(e: any) => {
-                              e.target.src = "/default-avatar.png";
-                            }}
-                          />
-                        </div>
+                 <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-blue-100">
+  <Avatar
+    src={
+      doc.profile_image.startsWith("http")
+        ? doc.profile_image
+        : `https://www.medimedia.ir${doc.profile_image}`
+    }
+    alt={doc.full_name}
+  />
+</div>
                         <div className="absolute -bottom-1 -right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
                       </div>
                       {/* Doctor Info */}
