@@ -76,18 +76,13 @@ export default function Ads() {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+      <div
         className="relative px-4 md:px-10 py-6 overflow-hidden"
       >
         <div className="flex flex-col gap-4">
           {banners.map((banner) => (
-            <motion.div
+            <div
               key={banner.id}
-              whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 200, damping: 12 }}
               onClick={() => {
                 if (banner.isIframe) {
                   setOpenDrawer(banner.id)
@@ -128,10 +123,10 @@ export default function Ads() {
               >
                 <ArrowLeft className="w-5 h-5 text-blue-600 group-hover:translate-x-[-2px] transition-transform" />
               </Button>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Drawer with iframe */}
       {banners.map(

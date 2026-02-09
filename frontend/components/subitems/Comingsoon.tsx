@@ -22,10 +22,8 @@ export default function ComingSoonBanners() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 -mt-4 mb-16 gap-6 px-4 md:px-10 py-3">
       {banners.map((banner) => (
-        <motion.div
+        <div
           key={banner.id}
-          whileHover={{ scale: 1.03 }}
-          transition={{ type: "spring", stiffness: 200, damping: 12 }}
           className="relative cursor-not-allowed rounded-2xl overflow-hidden shadow-lg bg-white/20 backdrop-blur-2xl border border-blue-300/50"
         >
           {/* Banner content */}
@@ -51,7 +49,7 @@ export default function ComingSoonBanners() {
             <Lock className="w-8 h-8 mb-2 text-white" />
             <span className="text-white font-semibold text-sm">به زودی</span>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   )

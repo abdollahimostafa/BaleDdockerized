@@ -127,7 +127,7 @@ const handleRegister = async () => {
       setRegisterSuccess(true);
       setTimeout(() => {
         window.location.href = "/main";
-      }, 1500);
+      }, 500);
     } else {
       setRegisterError(data.error || "ثبت نام انجام نشد، دوباره تلاش کنید.");
     }
