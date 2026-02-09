@@ -14,6 +14,10 @@ services:
     restart: always
     expose:
       - "3000"
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend/prisma:/app/prisma
 
   nginx:
     image: nginx:alpine
