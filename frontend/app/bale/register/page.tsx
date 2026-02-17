@@ -1,29 +1,37 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useBale } from "@/hooks/useBale";
+
+interface UserData {
+  national_number: string;
+  name: string;
+  family: string;
+  birth_date: string;
+  gender: string;
+}
+
+interface InsuranceData {
+  title: string;
+  sepas_system_code: string;
+  type: string;
+}
+
 interface InquiryResponse {
   status: boolean;
   message: string;
   data: {
-    user: {
-      national_number: string;
-      name: string;
-      family: string;
-      birth_date: string;
-      gender: string;
-    };
-    insurance: {
-      title: string;
-      sepas_system_code: string;
-      type: string;
-    };
+    user: UserData | null;
+    insurance: InsuranceData | null;
   };
 }
+
 const getBirthYear = (birthDate?: string) => {
-  if (!birthDate) return "نامشخص";
-  return birthDate.slice(0, 4); // first 4 characters
+  if (!birthDate) return "";
+  // If masked like 1349**** → take first 4
+  // If full like 13491234 → take first 4
+  return birthDate.slice(0, 4);
 };
+
 export default function RegisterPage() {
   const { user, ready, requestPhoneNumber } = useBale();
 
@@ -31,13 +39,21 @@ export default function RegisterPage() {
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [nationalId, setNationalId] = useState("");
+
   const [inquiry, setInquiry] = useState<InquiryResponse["data"] | null>(null);
   const [loading, setLoading] = useState(false);
-
   const [registerError, setRegisterError] = useState<string | null>(null);
-const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
+  const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
 
-  // Request phone number on page load
+  // ── Manual fill when user is null ───────────────────────────────
+  const [manualUser, setManualUser] = useState<Partial<UserData>>({
+    name: "",
+    family: "",
+    gender: "",
+    birth_date: "",
+  });
+
+  // Request phone number on mount
   useEffect(() => {
     if (!ready) return;
 
@@ -66,22 +82,33 @@ const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
   const handleNextStep = () => setStep(2);
 
   const handleCheck = async () => {
-    if (!nationalId) return;
+    if (!nationalId.trim() || nationalId.length !== 10) {
+      alert("لطفاً یک کد ملی معتبر ۱۰ رقمی وارد کنید.");
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await fetch("https://www.medimedia.ir/api/v1/insurance/inquire", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ national_code: nationalId }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ national_code: nationalId.trim() }),
       });
 
       const data: InquiryResponse = await res.json();
 
       if (data.status && data.data) {
         setInquiry(data.data);
+
+        // If user came back → prefill manual fields
+        if (data.data.user) {
+          setManualUser({
+            name: data.data.user.name || "",
+            family: data.data.user.family || "",
+            gender: data.data.user.gender || "",
+            birth_date: data.data.user.birth_date || "",
+          });
+        }
       } else {
         alert(data.message || "خطا در دریافت اطلاعات.");
       }
@@ -92,72 +119,100 @@ const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
       setLoading(false);
     }
   };
-const handleRegister = async () => {
-  if (!user?.id) {
-    setRegisterError("شناسه بله دریافت نشده است.");
-    return;
-  }
-  if (!phoneNumber || !nationalId || !inquiry) {
-    setRegisterError("اطلاعات ناقص است.");
-    return;
-  }
 
-  setLoading(true);
-  setRegisterError(null);
-
-  try {
-    const res = await fetch("/api/user/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        baleId: String(user.id),          // MUST be string
-        phone: String(phoneNumber),
-        nationalId: String(nationalId),
-        firstName: inquiry.user.name ?? "",
-        lastName: inquiry.user.family ?? "",
-        gender: inquiry.user.gender ?? "",
-        birthYear: inquiry.user.birth_date?.slice(0, 4) ?? "",
-        insurance: inquiry.insurance?.title ?? "",
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.ok) {
-      setRegisterSuccess(true);
-      setTimeout(() => {
-        window.location.href = "/main";
-      }, 500);
-    } else {
-      setRegisterError(data.error || "ثبت نام انجام نشد، دوباره تلاش کنید.");
+  const handleRegister = async () => {
+    if (!user?.id) {
+      setRegisterError("شناسه بله دریافت نشده است.");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    setRegisterError("خطا در ارتباط با سرور.");
-  } finally {
-    setLoading(false);
-  }
-};
 
+    if (!phoneNumber || !nationalId) {
+      setRegisterError("اطلاعات ناقص است.");
+      return;
+    }
 
+    // Decide final user data
+    let finalUser: UserData;
 
+    if (inquiry?.user) {
+      finalUser = inquiry.user;
+    } else {
+      // Manual mode — check required fields
+      if (!manualUser.name || !manualUser.family || !manualUser.gender || !manualUser.birth_date) {
+        setRegisterError("لطفاً تمام اطلاعات خواسته شده را وارد کنید.");
+        return;
+      }
+
+      finalUser = {
+        national_number: nationalId,
+        name: manualUser.name,
+        family: manualUser.family,
+        gender: manualUser.gender,
+        birth_date: manualUser.birth_date,
+      };
+    }
+
+    setLoading(true);
+    setRegisterError(null);
+
+    try {
+      const res = await fetch("/api/user/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baleId: String(user.id),
+          phone: String(phoneNumber),
+          nationalId: String(nationalId),
+          firstName: finalUser.name,
+          lastName: finalUser.family,
+          gender: finalUser.gender,
+          birthYear: getBirthYear(finalUser.birth_date),
+          insurance: inquiry?.insurance?.title ?? "",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setRegisterSuccess(true);
+        setTimeout(() => {
+          window.location.href = "/main";
+        }, 800);
+      } else {
+        setRegisterError(data.error || "ثبت نام انجام نشد، دوباره تلاش کنید.");
+      }
+    } catch (err) {
+      console.error(err);
+      setRegisterError("خطا در ارتباط با سرور.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const hasUserData = !!inquiry?.user;
+  const showManualForm = inquiry && !hasUserData;
 
   return (
-    <div className="min-h-screen flex items-center justify-center  px-4">
-      <div className="bg-white  p-8 w-full max-w-md space-y-6">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="bg-white p-8 w-full max-w-md space-y-6">
 
-        {/* Step 1: Phone number */}
+        {/* Step 1: Phone */}
         {step === 1 && (
           <div className="space-y-4">
-            <label className="block text-center text-2xl font-bold text-gray-700">شماره تماس شما</label>
-            <span className="text-center block font-light text-xs">با تایید دسترسی  شماره  شما نمایش داده میشود</span>
+            <label className="block text-center text-2xl font-bold text-gray-700">
+              شماره تماس شما
+            </label>
+            <span className="text-center block font-light text-xs">
+              با تایید دسترسی شماره شما نمایش داده میشود
+            </span>
+
             <input
               type="text"
               value={phoneNumber ?? ""}
               readOnly
               placeholder="شماره تلفن دریافت نشد"
               disabled
-              className="w-full p-3 py-2 border-gray-300 border  text-center rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full p-3 border border-gray-300 text-center rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
 
             {permissionError && (
@@ -183,23 +238,28 @@ const handleRegister = async () => {
           </div>
         )}
 
-        {/* Step 2: National ID */}
-{/* Step 2: National ID */}
+        {/* Step 2: National ID input */}
         {step === 2 && !inquiry && (
           <div className="space-y-4 -mt-10">
-            <label className="block text-center text-2xl font-bold text-gray-700">کد ملی شما</label>
-            <span className="text-center block font-light text-xs">کدملی شما برای ثبت نسخ و همچنین احراز هویت بیمه استفاده خواهد شد</span>
+            <label className="block text-center text-2xl font-bold text-gray-700">
+              کد ملی شما
+            </label>
+            <span className="text-center block font-light text-xs">
+              کد ملی شما برای ثبت نسخ و احراز هویت بیمه استفاده خواهد شد
+            </span>
+
             <input
               type="text"
               value={nationalId}
               onChange={(e) => setNationalId(e.target.value)}
               placeholder="کد ملی خود را وارد کنید"
-              className="w-full pp-3 py-2 text-center border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              maxLength={10}
+              className="w-full p-3 text-center border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
 
             <button
               onClick={handleCheck}
-              disabled={loading}
+              disabled={loading || !nationalId.trim()}
               className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition disabled:opacity-50"
             >
               {loading ? "...در حال بررسی" : "بررسی"}
@@ -207,40 +267,93 @@ const handleRegister = async () => {
           </div>
         )}
 
-  {/* Step 3: Show inquiry info */}
-{inquiry && (
-  <div className="space-y-4 text-right">
-    <h2 className="text-2xl block text-center font-semibold">اطلاعات کاربر</h2>
+        {/* Step 3: Show result / manual fill */}
+        {inquiry && (
+          <div className="space-y-5 text-right">
+            <h2 className="text-2xl font-semibold text-center">اطلاعات شما</h2>
 
-    <p>نام: {inquiry.user.name}</p>
-    <p>نام خانوادگی: {inquiry.user.family}</p>
-    <p>جنسیت: {inquiry.user.gender}</p>
-    <p>سال تولد: {getBirthYear(inquiry.user.birth_date)}</p>
-    <p>بیمه: {inquiry.insurance.title}</p>
-    <p>شناسه یکتا بله: {user?.id}</p>
+            {/* Insurance – always show if present */}
+            {inquiry.insurance && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-medium">بیمه: {inquiry.insurance.title}</p>
+              </div>
+            )}
 
-    {registerError && (
-      <p className="text-red-500 text-center">{registerError}</p>
-    )}
-
-    {registerSuccess && (
-      <p className="text-green-600 text-center">ثبت نام با موفقیت انجام شد!</p>
-    )}
-
-    <button
-      onClick={handleRegister}
-      disabled={loading || registerSuccess}
-      className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-green-700 transition disabled:opacity-50"
-    >
-      {loading ? "در حال ثبت‌نام..." : "ثبت نام"}
-    </button>
-
-    <span className="text-center block font-light text-xs text-gray-500">
-      با ثبت نام در مدی مدیا شما با قوانین و ضوابط سامانه موافق هستید
-    </span>
+            {hasUserData ? (
+              /* ── Auto-filled case ── */
+<div className="space-y-2">
+    <p>نام: {inquiry.user?.name ?? "—"}</p>
+    <p>نام خانوادگی: {inquiry.user?.family ?? "—"}</p>
+    <p>جنسیت: {inquiry.user?.gender ?? "—"}</p>
+    <p>سال تولد: {getBirthYear(inquiry.user?.birth_date) || "—"}</p>
   </div>
-)}
+            ) : (
+              /* ── Manual fill case ── */
+              <div className="space-y-4">
+                <p className="text-amber-700 text-sm text-center font-medium">
+                  اطلاعات هویتی شما از سامانه قابل دریافت نبود.<br />
+                  لطفاً اطلاعات زیر را به‌درستی وارد کنید:
+                </p>
 
+                <input
+                  type="text"
+                  placeholder="نام"
+                  value={manualUser.name ?? ""}
+                  onChange={(e) => setManualUser({ ...manualUser, name: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+
+                <input
+                  type="text"
+                  placeholder="نام خانوادگی"
+                  value={manualUser.family ?? ""}
+                  onChange={(e) => setManualUser({ ...manualUser, family: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+
+                <select
+                  value={manualUser.gender ?? ""}
+                  onChange={(e) => setManualUser({ ...manualUser, gender: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                >
+                  <option value="" disabled>جنسیت</option>
+                  <option value="مرد">مرد</option>
+                  <option value="زن">زن</option>
+                </select>
+
+                <input
+                  type="text"
+                  placeholder="سال تولد (مثال: ۱۳۷۰)"
+                  value={manualUser.birth_date ?? ""}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9]/g, "");
+                    if (val.length > 4) val = val.slice(0, 4);
+                    setManualUser({ ...manualUser, birth_date: val });
+                  }}
+                  maxLength={4}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+              </div>
+            )}
+
+            {registerError && <p className="text-red-600 text-center">{registerError}</p>}
+            {registerSuccess && (
+              <p className="text-green-600 text-center font-medium">ثبت نام با موفقیت انجام شد!</p>
+            )}
+
+            <button
+              onClick={handleRegister}
+              disabled={loading || registerSuccess}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition disabled:opacity-50"
+            >
+              {loading ? "در حال ثبت‌نام..." : "ثبت نام"}
+            </button>
+
+            <p className="text-center text-xs text-gray-500">
+              با ثبت نام در مدی‌مدیا شما با قوانین و ضوابط سامانه موافق هستید
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
