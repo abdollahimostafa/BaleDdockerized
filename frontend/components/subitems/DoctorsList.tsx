@@ -52,7 +52,7 @@ function Avatar({ src, alt }: { src: string; alt: string }) {
       width={80}
       height={80}
       className="object-cover w-full h-full"
-      onError={() => setImgSrc("/default-avatar.png")}
+      onError={() => setImgSrc("/demoavatar.png")}
     />
   );
 }
@@ -190,7 +190,7 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
     src={
       doc.profile_image.startsWith("http")
         ? doc.profile_image
-        : `https://www.medimedia.ir${doc.profile_image}`
+        : `/demoavatar.png`
     }
     alt={doc.full_name}
   />

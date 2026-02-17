@@ -64,14 +64,14 @@ export default function Ads() {
     
 
  
-    {
-      id: "drug",
-      title: "تداخلات دارویی",
-      subtitle: "بررسی تداخل های دارویی",
-      image: "/drug.png",
-      site: "https://www.medimedia.ir/drug-interaction?gg=no_header",
-      isIframe: true,
-    },
+    // {
+    //   id: "drug",
+    //   title: "تداخلات دارویی",
+    //   subtitle: "بررسی تداخل های دارویی",
+    //   image: "/drug.png",
+    //   site: "https://www.medimedia.ir/drug-interaction?gg=no_header",
+    //   isIframe: true,
+    // },
   ]
 
   return (
