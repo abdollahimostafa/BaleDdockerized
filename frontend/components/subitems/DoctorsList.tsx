@@ -105,7 +105,7 @@ useEffect(() => {
   const user = webApp?.initDataUnsafe?.user;
 
   if (!user?.id) return;
-
+  console.log(user.id)
   fetch("/api/user/national-id", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -121,6 +121,8 @@ useEffect(() => {
       }
     })
     .catch(console.error);
+  console.log(nationalId)
+  console.log(phoneNumber)
 
 }, [ready]);
     
@@ -146,6 +148,9 @@ useEffect(() => {
       console.error("Service package ID not available");
       return;
     }
+  console.log(nationalId)
+  console.log(phoneNumber)
+
     const normalizedPhone = normalizeIranianPhone(phoneNumber);
   
   if (!normalizedPhone) {
