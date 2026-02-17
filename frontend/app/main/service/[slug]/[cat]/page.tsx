@@ -4,7 +4,6 @@ import { ArrowLeftCircle, Eye, Stethoscope, Microscope, CalendarDays, Syringe } 
 import Image from "next/image"
 import DoctorsList from "@/components/subitems/DoctorsList"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
 
 export default function ServicePage() {
   const params = useParams()

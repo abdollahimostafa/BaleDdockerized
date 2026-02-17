@@ -1,40 +1,27 @@
-// app/api/user/national-id/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // ← adjust path to your Prisma client
-
-
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { phone } = body;
+    const { baleId } = body;
 
-    if (!phone || typeof phone !== "string") {
+    if (!baleId || typeof baleId !== "string") {
       return NextResponse.json(
-        { ok: false, error: "Phone number is required" },
+        { ok: false, error: "Bale ID is required" },
         { status: 400 }
       );
     }
 
-    const normalized = phone;
-
-    if (!normalized) {
-      return NextResponse.json(
-        { ok: false, error: "Invalid phone number format" },
-        { status: 400 }
-      );
-    }
-
-    // Find user by normalized phone
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: {
-        phone: normalized,
+        baleId: baleId,
       },
       select: {
         nationalId: true,
+        phone: true,
         firstName: true,
         lastName: true,
-        // add any other fields you might need
       },
     });
 
@@ -48,9 +35,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       nationalId: user.nationalId,
+      phone: user.phone,
     });
+
   } catch (err) {
-    console.error("[GET_NATIONAL_ID]", err);
+    console.error("[GET_USER_BY_BALE_ID]", err);
     return NextResponse.json(
       { ok: false, error: "Internal server error" },
       { status: 500 }

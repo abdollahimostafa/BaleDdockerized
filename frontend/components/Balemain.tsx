@@ -4,7 +4,6 @@ import {  Eye, Stethoscope, Microscope, CalendarDays, Syringe } from "lucide-rea
 import { motion } from "framer-motion"
 import Image from "next/image"
 import ComingSoonBanners from "./subitems/Comingsoon"
-import Footban from "./subitems/Footban"
 import Ads from "./subitems/banner"
 
 export default function HomePage() {

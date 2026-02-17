@@ -98,39 +98,31 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
   const [permissionError, setPermissionError] = useState<string | null>(null);
 const [nationalId, setNationalId] = useState<string | null>(null);
 
-    useEffect(() => {
-      if (!ready) return;
-  
-      window.Bale?.WebApp.requestContact(async(granted, phone) => {
-        if (granted && phone) {
-          setPhoneNumber(phone);
-          setPermissionError(null);
-          try {
-        const res = await fetch("/api/user/national-id", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: phone }),
-        });
+useEffect(() => {
+  if (!ready) return;
 
-        const data = await res.json();
+  const webApp = window.Bale?.WebApp;
+  const user = webApp?.initDataUnsafe?.user;
 
-        if (data.ok && data.nationalId) {
-          setNationalId(data.nationalId);
-          console.log("National ID loaded from server:", data.nationalId);
-        } else {
-          console.warn("National ID not found:", data.error);
-          // You can show a message like:
-          // setSomeError("کد ملی شما پیدا نشد. لطفاً بعداً امتحان کنید.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch national ID:", err);
-        // Optional: set error state for UI
+  if (!user?.id) return;
+
+  fetch("/api/user/national-id", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      baleId: String(user.id),
+    }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        setNationalId(data.nationalId);
+        setPhoneNumber(data.phone);
       }
-        } else {
-          setPermissionError("برای ادامه لطفاً دسترسی به شماره تلفن خود را بدهید.");
-        }
-      });
-    }, [ready]);
+    })
+    .catch(console.error);
+
+}, [ready]);
     
   useEffect(() => {
     const fetchDoctors = async () => {
