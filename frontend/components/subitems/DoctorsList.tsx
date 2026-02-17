@@ -169,7 +169,7 @@ const [nationalId, setNationalId] = useState<string | null>(null);
     setPaymentUrl(null);
 if (!nationalId) {
     console.warn("National ID is missing – cannot proceed with reservation");
-    // Option A: block the action
+    // Option A: block the act
     alert("کد ملی شما یافت نشد. لطفاً از بخش ثبت‌نام اقدام کنید.");
     return;
 
