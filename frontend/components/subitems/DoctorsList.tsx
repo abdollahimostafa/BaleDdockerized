@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Calendar, User, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBale } from "@/hooks/useBale"
 
 interface Medic {
   id: string;
@@ -42,6 +43,31 @@ interface ApiResponse {
     medics: Medic[];
   };
 }
+const normalizeIranianPhone = (phone: string | null): string | null => {
+  if (!phone) return null;
+  
+  // Remove any spaces, dashes, etc. (just in case)
+  let cleaned = phone.replace(/[\s-]/g, "");
+  
+  // If starts with +98 → replace with 0
+  if (cleaned.startsWith("+98")) {
+    return "0" + cleaned.slice(3);
+  }
+  
+  // If already starts with 0 (09xx...) → keep as is
+  if (cleaned.startsWith("09")) {
+    return cleaned;
+  }
+  
+  // If starts with 98 without + (rare, but possible)
+  if (cleaned.startsWith("98")) {
+    return "0" + cleaned.slice(2);
+  }
+  
+  // Fallback: return original (or you can throw/log error)
+  return cleaned;
+};
+
 function Avatar({ src, alt }: { src: string; alt: string }) {
   const [imgSrc, setImgSrc] = useState(src);
 
@@ -67,7 +93,45 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
   const [reservationLoading, setReservationLoading] = useState(false);
   const [reservationSuccess, setReservationSuccess] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const { user, ready, requestPhoneNumber } = useBale();
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+const [nationalId, setNationalId] = useState<string | null>(null);
 
+    useEffect(() => {
+      if (!ready) return;
+  
+      window.Bale?.WebApp.requestContact(async(granted, phone) => {
+        if (granted && phone) {
+          setPhoneNumber(phone);
+          setPermissionError(null);
+          try {
+        const res = await fetch("/api/user/national-id", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: phone }),
+        });
+
+        const data = await res.json();
+
+        if (data.ok && data.nationalId) {
+          setNationalId(data.nationalId);
+          console.log("National ID loaded from server:", data.nationalId);
+        } else {
+          console.warn("National ID not found:", data.error);
+          // You can show a message like:
+          // setSomeError("کد ملی شما پیدا نشد. لطفاً بعداً امتحان کنید.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch national ID:", err);
+        // Optional: set error state for UI
+      }
+        } else {
+          setPermissionError("برای ادامه لطفاً دسترسی به شماره تلفن خود را بدهید.");
+        }
+      });
+    }, [ready]);
+    
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -90,19 +154,32 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
       console.error("Service package ID not available");
       return;
     }
-
+    const normalizedPhone = normalizeIranianPhone(phoneNumber);
+  
+  if (!normalizedPhone) {
+    // Optional: show UI error / toast
+    console.error("No valid phone number available");
+    setPermissionError("شماره تلفن معتبر دریافت نشد.");
+    return;
+  }
     setSelectedDoctor(doctor);
     setDrawerOpen(true);
     setReservationLoading(true);
     setReservationSuccess(false);
     setPaymentUrl(null);
+if (!nationalId) {
+    console.warn("National ID is missing – cannot proceed with reservation");
+    // Option A: block the action
+    alert("کد ملی شما یافت نشد. لطفاً از بخش ثبت‌نام اقدام کنید.");
+    return;
 
+  }
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("Accept", "application/json");
-      myHeaders.append("X-National-Code", "4120032991");
-      myHeaders.append("X-Mobile", "09904289707");
+      myHeaders.append("X-National-Code", nationalId);
+      myHeaders.append("X-Mobile", normalizedPhone);
 
       const raw = JSON.stringify({
         medic_id: doctor.id,
@@ -278,9 +355,8 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3" dir="rtl">رزرو با موفقیت انجام شد!</h3>
                   <p className="text-gray-600 leading-relaxed text-sm">
-                    جهت ثبت نهایی و دریافت نوبت خود با کلیک بر روی دکمه زیر به درگاه پرداخت امن هدایت خواهید شد
-                  </p>
-                  {paymentUrl && (
+بزودی برای شما پیامکی حاوی لینک پرداخت هزینه سرویس ارسال می گردد.                  </p>
+                  {/* {paymentUrl && (
                     <Button
                       size="lg"
                       className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium"
@@ -288,7 +364,7 @@ export default function DoctorsList({ apiUrl }: { apiUrl: string }) {
                     >
                       رفتن به صفحه پرداخت
                     </Button>
-                  )}
+                  )} */}
                 </motion.div>
               )}
             </AnimatePresence>

@@ -1,10 +1,10 @@
 "use client"
 
 import { ArrowLeftCircle, Eye, Stethoscope, Microscope, CalendarDays, Syringe } from "lucide-react"
-import { motion } from "framer-motion"
 import Image from "next/image"
 import DoctorsList from "@/components/subitems/DoctorsList"
 import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function ServicePage() {
   const params = useParams()
@@ -18,6 +18,7 @@ export default function ServicePage() {
     { icon: <CalendarDays className="w-8 h-8 text-white" />, title: "نوبت‌ها", desc: "مدیریت رزرو و تاریخ مراجعات" },
     { icon: <Syringe className="w-8 h-8 text-white" />, title: "تزریقات", desc: "درمان در منزل و مرکز درمانی" },
   ]
+
 
   // Construct API URL dynamically using the [service] param
 const apiUrl = `https://www.medimedia.ir/api/v1/service-packages/services/online/${service}/${cate}`
