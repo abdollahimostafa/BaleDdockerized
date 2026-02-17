@@ -3,7 +3,20 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["www.medimedia.ir", "medimedia.ir"], // add both if needed
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.medimedia.ir",
+        port: "",
+        pathname: "/**", // allow all paths under this domain
+      },
+      {
+        protocol: "https",
+        hostname: "medimedia.ir",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

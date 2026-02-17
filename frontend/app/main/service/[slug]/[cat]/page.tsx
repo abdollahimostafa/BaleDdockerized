@@ -54,14 +54,13 @@ const apiUrl = `https://www.medimedia.ir/api/v1/service-packages/services/online
 
         {/* Foreground content */}
         <div
-
           className="relative z-10 mt-4 flex flex-col items-center"
         >
           <h1 className="text-3xl text-center md:text-4xl font-bold">انتخاب پزشک</h1>
           <p className="text-center mt-2 text-sm md:text-base text-white/90">
             دسترسی سریع به پزشک، آزمایشگاه و خدمات پزشکی
           </p>
-          <a href="/" className="flex bg-white/20 backdrop-blur-xl px-4 py-1 rounded-2xl text-xs font-light mt-3 border border-white/10">
+          <a href="/main" className="flex bg-white/20 backdrop-blur-xl px-4 py-1 rounded-2xl text-xs font-light mt-3 border border-white/10">
             بازگشت <ArrowLeftCircle className="w-4 ml-1 h-4"/>
           </a>
         </div>

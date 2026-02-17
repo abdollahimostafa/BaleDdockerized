@@ -11,7 +11,7 @@ export default function HomePage() {
   const userName = "مدی مدیا"
 
   return (
-    <div className="h-full max-w-md">
+    <div className="h-full ">
       <div className=" p-6 pb-5 xl:px-30 xl:pr-60 xl:pl-60 min-h-60 bg-[#2b7fff] rounded-b-4xl shadow-sm relative overflow-hidden text-white">
         
         {/* Background Pattern & Abstract Shapes */}

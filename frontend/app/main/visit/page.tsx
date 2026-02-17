@@ -60,7 +60,7 @@ export default function HomePage() {
           <p className="text-center mt-2 text-sm md:text-base text-white/90">
             دسترسی سریع به پزشک، آزمایشگاه و خدمات پزشکی
           </p>
-          <a href="/" className="flex bg-white/20 backdrop-blur-xl px-4 py-1 rounded-2xl text-xs font-light mt-3 border border-white/10">
+          <a href="/main" className="flex bg-white/20 backdrop-blur-xl px-4 py-1 rounded-2xl text-xs font-light mt-3 border border-white/10">
             بازگشت <ArrowLeftCircle className="w-4  ml-1 h-4"/>
           </a>
         </motion.div>
