@@ -353,15 +353,27 @@ if (!nationalId) {
                   <h3 className="text-2xl font-bold text-gray-900 mb-3" dir="rtl">رزرو با موفقیت انجام شد!</h3>
                   <p className="text-gray-600 leading-relaxed text-sm">
 بزودی برای شما پیامکی حاوی لینک پرداخت هزینه سرویس ارسال می گردد.                  </p>
-                  {/* {paymentUrl && (
-                    <Button
-                      size="lg"
-                      className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                      onClick={() => window.location.href = paymentUrl}
-                    >
-                      رفتن به صفحه پرداخت
-                    </Button>
-                  )} */}
+    {paymentUrl && (
+  <Button
+    size="lg"
+    className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+    onClick={() => {
+      if (window.Bale?.WebApp) {
+        // ✅ type assertion برای رفع خطای TS
+        (window.Bale.WebApp as any).openLink(paymentUrl, {
+          try_instant_view: true, // optional: اگر پشتیبانی شود، صفحه سریع در مینی‌اپ باز می‌شود
+        });
+      } else {
+        // fallback اگر کاربر خارج از بله باشد
+        window.open(paymentUrl, "_blank");
+      }
+    }}
+  >
+    رفتن به صفحه پرداخت
+  </Button>
+)}
+
+
                 </motion.div>
               )}
             </AnimatePresence>
