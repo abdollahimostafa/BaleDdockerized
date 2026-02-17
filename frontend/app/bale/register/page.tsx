@@ -275,17 +275,17 @@ export default function RegisterPage() {
             {/* Insurance – always show if present */}
             {inquiry.insurance && (
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">بیمه: {inquiry.insurance.title}</p>
+                <p className="font-medium text-right">بیمه: {inquiry.insurance.title}</p>
               </div>
             )}
 
             {hasUserData ? (
               /* ── Auto-filled case ── */
-<div className="space-y-2">
-    <p>نام: {inquiry.user?.name ?? "—"}</p>
-    <p>نام خانوادگی: {inquiry.user?.family ?? "—"}</p>
-    <p>جنسیت: {inquiry.user?.gender ?? "—"}</p>
-    <p>سال تولد: {getBirthYear(inquiry.user?.birth_date) || "—"}</p>
+<div className="space-y-2 text-right" >
+    <p className="text-right">نام: {inquiry.user?.name ?? "—"}</p>
+    <p className="text-right">نام خانوادگی: {inquiry.user?.family ?? "—"}</p>
+    <p className="text-right">جنسیت: {inquiry.user?.gender ?? "—"}</p>
+    <p className="text-right">سال تولد: {getBirthYear(inquiry.user?.birth_date) || "—"}</p>
   </div>
             ) : (
               /* ── Manual fill case ── */
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                   placeholder="نام"
                   value={manualUser.name ?? ""}
                   onChange={(e) => setManualUser({ ...manualUser, name: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border text-right border-gray-300 rounded-lg"
                 />
 
                 <input
@@ -308,17 +308,17 @@ export default function RegisterPage() {
                   placeholder="نام خانوادگی"
                   value={manualUser.family ?? ""}
                   onChange={(e) => setManualUser({ ...manualUser, family: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border text-right border-gray-300 rounded-lg"
                 />
 
                 <select
                   value={manualUser.gender ?? ""}
                   onChange={(e) => setManualUser({ ...manualUser, gender: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full p-3 border text-right border-gray-300 rounded-lg"
                 >
-                  <option value="" disabled>جنسیت</option>
-                  <option value="مرد">مرد</option>
-                  <option value="زن">زن</option>
+                  <option className="text-right" value="" disabled>جنسیت</option>
+                  <option className="text-right" value="مرد">مرد</option>
+                  <option className="text-right" value="زن">زن</option>
                 </select>
 
                 <input
@@ -331,7 +331,7 @@ export default function RegisterPage() {
                     setManualUser({ ...manualUser, birth_date: val });
                   }}
                   maxLength={4}
-                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  className="w-full text-right p-3 border border-gray-300 rounded-lg"
                 />
               </div>
             )}
