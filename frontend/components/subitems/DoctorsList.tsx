@@ -353,7 +353,7 @@ if (!nationalId) {
                   <h3 className="text-2xl font-bold text-gray-900 mb-3" dir="rtl">رزرو با موفقیت انجام شد!</h3>
                   <p className="text-gray-600 leading-relaxed text-sm">
 بزودی برای شما پیامکی حاوی لینک پرداخت هزینه سرویس ارسال می گردد.                  </p>
-    {paymentUrl && (
+             {paymentUrl && (
   <Button
     size="lg"
     className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium"
@@ -372,7 +372,6 @@ if (!nationalId) {
     رفتن به صفحه پرداخت
   </Button>
 )}
-
 
                 </motion.div>
               )}

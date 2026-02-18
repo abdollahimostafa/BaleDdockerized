@@ -25,7 +25,7 @@ const apiUrl = `https://www.medimedia.ir/api/v1/service-packages/services/online
     <div className="h-full">
       <div className="p-6 pb-5 xl:px-30 xl:pr-60 xl:pl-60 min-h-60 bg-[#2b7fff] rounded-b-4xl shadow-sm relative overflow-hidden text-white">
         
-        {/* Background Pattern & Abstract Shapes */}
+        {/* Background Pattern & Abstract Shaps */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
 
           <div className="absolute top-20 right-0 w-48 h-48 bg-white/10 rotate-45 rounded-3xl blur-xl"></div>
