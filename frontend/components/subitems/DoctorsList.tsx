@@ -123,6 +123,7 @@ useEffect(() => {
     .catch(console.error);
   console.log(nationalId)
   console.log(phoneNumber)
+  console.log(phoneNumber)
 
 }, [ready]);
     
@@ -149,7 +150,7 @@ useEffect(() => {
       return;
     }
   console.log(nationalId)
-  console.log(phoneNumber)
+  console.log(normalizeIranianPhone(phoneNumber))
 
     const normalizedPhone = normalizeIranianPhone(phoneNumber);
   
