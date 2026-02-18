@@ -5,7 +5,7 @@ import { yekanBakh } from "@/lib/font";
 
 
 export const metadata: Metadata = {
-  title: "My App",
+  title: "Medimedia Bot",
   description: "Main Layout with local fonts",
 };
 
