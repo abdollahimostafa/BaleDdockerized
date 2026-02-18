@@ -197,15 +197,16 @@ if (!nationalId) {
         `https://www.medimedia.ir/api/v1/service-packages/${servicePackageId}/take-turn`,
         requestOptions
       );
-      console.log(response.json())
+      // console.log(response.json())
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`HTTP error! status: ${response.status}`);
+      // }
 
-      const result = await response.json(); // Assuming JSON response
+      const result = await response.json();
+      console.log(result.data.payment_url); // Assuming JSON response
       setPaymentUrl(result.data.payment_url); // Replace with actual path, e.g., result.payment_url
-      console.log(paymentUrl)
+      console.log(paymentUrl);
       setReservationSuccess(true);
     } catch (error) {
       console.error("Reservation error:", error);
