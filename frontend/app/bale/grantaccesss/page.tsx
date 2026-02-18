@@ -77,7 +77,7 @@ export default function GrantAccess() {
                 >              <p className="text-gray-700 leading-7 text-sm mt-4">
 انجام طیف وسیعی از خدمات در سامانه سلامت ما با چند لمس ساده                </p>
                 <p className=" relative leading-7 text-sm mt-1 bg-blue-600 text-white rounded-xl px-1">
-از ویزیت تا ثبت نسخ و دریافت مشاوره های روانشاسی             
+از ویزیت تا ثبت نسخ و دریافت مشاوره های روانشناسی             
 
 <Image src="/pointinghand.svg" width={100} height={100} alt="pointer" className=" absolute w-15 h-15 -left-2 top-1 -rotate-10"/>
     </p></motion.div>
