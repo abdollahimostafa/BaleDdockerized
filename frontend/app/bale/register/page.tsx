@@ -80,9 +80,14 @@ export default function RegisterPage() {
   };
 
   const handleNextStep = () => setStep(2);
-
+const toEnglishDigits = (str: string) => {
+  return str
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+};
   const handleCheck = async () => {
-    if (!nationalId.trim() || nationalId.length !== 10) {
+      const normalizedNationalId = toEnglishDigits(nationalId).trim();
+    if (!normalizedNationalId || normalizedNationalId.length !== 10) {
       alert("لطفاً یک کد ملی معتبر ۱۰ رقمی وارد کنید.");
       return;
     }
@@ -92,7 +97,7 @@ export default function RegisterPage() {
       const res = await fetch("https://www.medimedia.ir/api/v1/insurance/inquire", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ national_code: nationalId.trim() }),
+        body: JSON.stringify({ national_code: normalizedNationalId }),
       });
 
       const data: InquiryResponse = await res.json();

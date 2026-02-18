@@ -197,6 +197,8 @@ if (!nationalId) {
         `https://www.medimedia.ir/api/v1/service-packages/${servicePackageId}/take-turn`,
         requestOptions
       );
+      console.log(response)
+      console.log(response.json())
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
