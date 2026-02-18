@@ -149,7 +149,7 @@ const toEnglishDigits = (str: string) => {
       }
 
       finalUser = {
-        national_number: nationalId,
+        national_number:toEnglishDigits(nationalId).trim() ,
         name: manualUser.name,
         family: manualUser.family,
         gender: manualUser.gender,
@@ -167,7 +167,7 @@ const toEnglishDigits = (str: string) => {
         body: JSON.stringify({
           baleId: String(user.id),
           phone: String(phoneNumber),
-          nationalId: String(nationalId),
+          nationalId: String(toEnglishDigits(nationalId).trim()),
           firstName: finalUser.name,
           lastName: finalUser.family,
           gender: finalUser.gender,
