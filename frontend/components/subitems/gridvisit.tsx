@@ -192,10 +192,6 @@ const Mainvivist = () => {
   const router = useRouter();
 
 
-  const handleClick = (url: string) => {
-    router.push(url);
-  };
-
   return (
     <section className="relative py-5 px-6 xl:px-30 xl:pr-60 xl:pl-60">
       <Image
@@ -227,7 +223,7 @@ const Mainvivist = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.35, delay: i * 0.04 }}
             viewport={{ once: true }}
-            onClick={() => handleClick(item.lin)}
+            onClick={() => router.push(item.lin)}
             className="flex flex-col items-center cursor-pointer group"
           >
             <div
