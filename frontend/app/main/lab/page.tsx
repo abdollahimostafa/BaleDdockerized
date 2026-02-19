@@ -78,7 +78,7 @@ export default function HomePage() {
         {/* <Asss /> */}
 
       {/* Sers Section */}
-{/* <Maingrid/> */}
+{/* <Maiid/> */}
 {/* <Footban/> */}
     </div>
   )
