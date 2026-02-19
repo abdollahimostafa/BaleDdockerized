@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useBale } from "@/hooks/useBale";
+import { useRouter } from "next/navigation";
 
 interface UserData {
   national_number: string;
@@ -12,7 +13,7 @@ interface UserData {
 
 interface InsuranceData {
   title: string;
-  sepas_system_code: string;
+  sepas_system_code: string;  
   type: string;
 }
 
@@ -26,6 +27,7 @@ interface InquiryResponse {
 }
 
 const getBirthYear = (birthDate?: string) => {
+  
   if (!birthDate) return "";
   // If masked like 1349**** → take first 4
   // If full like 13491234 → take first 4
@@ -33,8 +35,9 @@ const getBirthYear = (birthDate?: string) => {
 };
 
 export default function RegisterPage() {
+  
   const { user, ready, requestPhoneNumber } = useBale();
-
+const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
@@ -180,9 +183,9 @@ const toEnglishDigits = (str: string) => {
 
       if (data.ok) {
         setRegisterSuccess(true);
-        setTimeout(() => {
-          window.location.href = "/main";
-        }, 800);
+  setTimeout(() => {
+    router.push("/main");
+  }, 500);
       } else {
         setRegisterError(data.error || "ثبت نام انجام نشد، دوباره تلاش کنید.");
       }
@@ -343,7 +346,7 @@ const toEnglishDigits = (str: string) => {
 
             {registerError && <p className="text-red-600 text-center">{registerError}</p>}
             {registerSuccess && (
-              <p className="text-green-600 text-center font-medium">ثبت نام با موفقیت انجام شد!</p>
+              <p className="text-green-600 text-center font-medium" dir="rtl">ثبت نام با موفقیت انجام شد!</p>
             )}
 
             <button
