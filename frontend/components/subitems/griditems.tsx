@@ -80,7 +80,7 @@ const Maingrid = () => {
          alt="bgpat"
        />
  
-       {/* Section Header */}
+       {/* Section Headesssr */}
        <div className="flex justify-between items-center mb-6">
          <div className="text-right w-1/2">
            <div className="bg-black/10 backdrop-blur-md px-3 py-1 text-sm text-black/60 font-light w-fit rounded-full">
